@@ -78,7 +78,23 @@
 
             },
             cal() {
+                this.exp.forEach(function(element) {
+                    if (this.isNumber(element) || this.isSingleOps(element)) {
+                        if (this.isSingleOps(element) && this.tmpval !== "") {
+                            this.vals.push(this.tmpval);
+                            this.ops.push("*");
+                            this.tmpval = element;
+                        } else {
+                            this.tmpval += element;
 
+                        }
+                    } else {
+                        this.vals.push(this.tmpval);
+                        this.ops.push(element);
+                        this.tmpval = "";
+                    }
+                }, this);
+                this.vals.push(this.tmpval);
 
             },
             isSingleOps(ops) {
