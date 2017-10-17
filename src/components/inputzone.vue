@@ -78,23 +78,89 @@
 
             },
             cal() {
+                let singleMark = false;
                 this.exp.forEach(function(element) {
-                    if (this.isNumber(element) || this.isSingleOps(element)) {
-                        if (this.isSingleOps(element) && this.tmpval !== "") {
-                            this.vals.push(this.tmpval);
-                            this.ops.push("*");
-                            this.tmpval = element;
-                        } else {
-                            this.tmpval += element;
-
-                        }
+                    if (this.isNumber(element)) {
+                        this.tmpval += element;
                     } else {
-                        this.vals.push(this.tmpval);
-                        this.ops.push(element);
-                        this.tmpval = "";
+                        if (this.isSingleOps(element)) {
+                            if (this.tmpval === "") {
+                                singleMark = true;
+                                this.ops.push(element);
+
+                            } else {
+                                singleMark = true;
+                                this.vals.push(this.tmpval);
+                                this.ops.push('*');
+                                this.ops.push(element);
+                                this.tmpval = "";
+                            }
+                        } else {
+                            if (singleMark) {
+                                let tmpOpt = this.ops.pop();
+                                console.log(tmpOpt);
+                                let tmpVal = this.tmpval;
+                                this.tmpval = "";
+                                switch (tmpOpt) {
+                                    case "sin":
+                                        tmpVal = Math.sin(tmpVal);
+                                        break;
+                                    case "cos":
+                                        tmpVal = Math.cos(tmpVal);
+                                        break;
+                                    case "tan":
+                                        tmpVal = Math.tan(tmpVal);
+                                        break;
+                                    case "log":
+                                        tmpVal = Math.log2(tmpVal);
+                                        break;
+
+                                }
+                                this.vals.push(tmpVal);
+                                this.ops.push(element);
+                                singleMark = false;
+                            } else {
+                                this.vals.push(this.tmpval);
+                                this.ops.push(message);
+                                this.tmpval = "";
+                            }
+                        }
+                        // if (this.isSingleOps(element) && !this.singleMark) {
+                        //     this.singleMark = true;
+                        //     this.vals.push(this.tmpval);
+                        //     this.ops.push(element);
+                        //     this.tmpval = "";
+                        // } else if (this.singleMark) {
+                        //     let tmpOpt = this.ops.pop();
+                        //     let tmpVal = this.tmpval;
+                        //     this.tmpval = "";
+                        //     switch (tmpOpt) {
+                        //         case "sin":
+                        //             tmpVal = Math.sin(tmpVal);
+                        //             break;
+                        //         case "cos":
+                        //             tmpVal = Math.cos(tmpVal);
+                        //             break;
+                        //         case "tan":
+                        //             tmpVal = Math.tan(tmpVal);
+                        //             break;
+                        //         case "log":
+                        //             tmpVal = Math.log2(tmpVal);
+                        //             break;
+
+                        //     }
+                        //     this.vals.push(tmpVal);
+                        //     this.singleMark = false;
+                        // } else {
+                        //     this.vals.push(this.tmpval);
+                        //     this.ops.push(element);
+                        //     this.tmpval = "";
+                        // }
+
                     }
                 }, this);
                 this.vals.push(this.tmpval);
+                // this.init();
 
             },
             isSingleOps(ops) {
@@ -102,7 +168,7 @@
                 else return false;
             },
             isNumber(val) {
-                if ('0123456789'.indexOf(val) !== -1) return true;
+                if ('.00123456789'.indexOf(val) !== -1) return true;
                 else return false;
             }
         }
