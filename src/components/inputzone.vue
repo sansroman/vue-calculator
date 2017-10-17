@@ -52,23 +52,9 @@
                         this.init();
                         break;
                     default:
-                        {
-                            if (singleMark) {
-                                if (this.tmpval !== "") {
-                                    this.vals.push(this.tmpval);
-                                    this.tmpval = message;
-                                    this.ops.push('*');
-
-                                } else {
-                                    this.tmpval = message;
-                                }
-                            } else {
-                                this.vals.push(this.tmpval);
-                                this.tmpval = "";
-                                this.ops.push(message);
-                            }
-                            this.exp.push(message);
-                        }
+                        this.exp.push(message);
+                        this.Zmark = false;
+                        break;
 
                 }
 
@@ -93,9 +79,14 @@
             },
             cal() {
 
+
             },
             isSingleOps(ops) {
                 if ('sincostanlog'.indexOf(ops) !== -1) return true;
+                else return false;
+            },
+            isNumber(val) {
+                if ('0123456789'.indexOf(val) !== -1) return true;
                 else return false;
             }
         }
