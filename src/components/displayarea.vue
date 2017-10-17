@@ -36,6 +36,6 @@
 <style scoped>
     #displayarea {
         height: 160px;
-        background-color: orangered;
+        background-color: #f59674;
     }
 </style>

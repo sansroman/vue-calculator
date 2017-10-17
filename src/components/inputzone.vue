@@ -15,6 +15,7 @@
                 cals: ['^', 'ESC', 'C', '-', '+', 'sin', '*', '%', 'cos', 'tan', 'log', '='],
                 ops: [],
                 vals: [],
+                tmpval: '',
                 exp: [],
                 Zmark: false,
                 Pmark: false
@@ -29,18 +30,73 @@
                 if ((message === "0" || message === "00") && !this.Zmark) return;
                 if (message === "." && !this.Pmark) {
                     this.Pmark = true;
-                    if (!this.Zmark) this.exp.push('0');
+                    if (!this.Zmark) {
+                        this.exp.push("0");
+                    }
                 }
                 this.exp.push(message);
                 this.Zmark = true;
                 this.expChanged();
             },
             calBtnKeyon(message) {
-                console.log("cal:" + message);
+                let singleMark = this.isSingleOps(message);
+                if (!this.Zmark && !singleMark) return;
+                switch (message) {
+                    case "=":
+                        this.cal();
+                        break;
+                    case "ESC":
+                        this.esc();
+                        break;
+                    case "C":
+                        this.init();
+                        break;
+                    default:
+                        {
+                            if (singleMark) {
+                                if (this.tmpval !== "") {
+                                    this.vals.push(this.tmpval);
+                                    this.tmpval = message;
+                                    this.ops.push('*');
+
+                                } else {
+                                    this.tmpval = message;
+                                }
+                            } else {
+                                this.vals.push(this.tmpval);
+                                this.tmpval = "";
+                                this.ops.push(message);
+                            }
+                            this.exp.push(message);
+                        }
+
+                }
+
                 this.expChanged();
+
+
             },
             expChanged() {
                 this.$emit('changed', this.exp);
+            },
+            init() {
+                this.ops = [];
+                this.vals = [];
+                this.tmpval = "";
+                this.exp = [];
+                this.Pmark = false;
+                this.Zmark = false;
+            },
+            esc() {
+                this.exp.pop();
+
+            },
+            cal() {
+
+            },
+            isSingleOps(ops) {
+                if ('sincostanlog'.indexOf(ops) !== -1) return true;
+                else return false;
             }
         }
     }
