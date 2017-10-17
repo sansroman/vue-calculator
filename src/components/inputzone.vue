@@ -18,7 +18,8 @@
                 tmpval: '',
                 exp: [],
                 Zmark: false,
-                Pmark: false
+                Pmark: false,
+                opsRank: []
             }
         },
         components: {
@@ -86,82 +87,34 @@
                         if (this.isSingleOps(element)) {
                             if (this.tmpval === "") {
                                 singleMark = true;
-                                this.ops.push(element);
+                                this.cumPush(element);
 
                             } else {
                                 singleMark = true;
                                 this.vals.push(this.tmpval);
-                                this.ops.push('*');
-                                this.ops.push(element);
+                                this.cumPush('*');
+                                this.cumPush(element);
                                 this.tmpval = "";
                             }
                         } else {
                             if (singleMark) {
                                 let tmpOpt = this.ops.pop();
-                                console.log(tmpOpt);
                                 let tmpVal = this.tmpval;
                                 this.tmpval = "";
-                                switch (tmpOpt) {
-                                    case "sin":
-                                        tmpVal = Math.sin(tmpVal);
-                                        break;
-                                    case "cos":
-                                        tmpVal = Math.cos(tmpVal);
-                                        break;
-                                    case "tan":
-                                        tmpVal = Math.tan(tmpVal);
-                                        break;
-                                    case "log":
-                                        tmpVal = Math.log2(tmpVal);
-                                        break;
-
-                                }
+                                this.singleOptArithmetic(tmpVal, tmpOpt);
                                 this.vals.push(tmpVal);
-                                this.ops.push(element);
+                                this.cumPush(element);
                                 singleMark = false;
                             } else {
                                 this.vals.push(this.tmpval);
-                                this.ops.push(message);
+                                this.cumPush(element);
                                 this.tmpval = "";
                             }
                         }
-                        // if (this.isSingleOps(element) && !this.singleMark) {
-                        //     this.singleMark = true;
-                        //     this.vals.push(this.tmpval);
-                        //     this.ops.push(element);
-                        //     this.tmpval = "";
-                        // } else if (this.singleMark) {
-                        //     let tmpOpt = this.ops.pop();
-                        //     let tmpVal = this.tmpval;
-                        //     this.tmpval = "";
-                        //     switch (tmpOpt) {
-                        //         case "sin":
-                        //             tmpVal = Math.sin(tmpVal);
-                        //             break;
-                        //         case "cos":
-                        //             tmpVal = Math.cos(tmpVal);
-                        //             break;
-                        //         case "tan":
-                        //             tmpVal = Math.tan(tmpVal);
-                        //             break;
-                        //         case "log":
-                        //             tmpVal = Math.log2(tmpVal);
-                        //             break;
-
-                        //     }
-                        //     this.vals.push(tmpVal);
-                        //     this.singleMark = false;
-                        // } else {
-                        //     this.vals.push(this.tmpval);
-                        //     this.ops.push(element);
-                        //     this.tmpval = "";
-                        // }
 
                     }
                 }, this);
                 this.vals.push(this.tmpval);
-                // this.init();
-
             },
             isSingleOps(ops) {
                 if ('sincostanlog'.indexOf(ops) !== -1) return true;
@@ -170,6 +123,65 @@
             isNumber(val) {
                 if ('.00123456789'.indexOf(val) !== -1) return true;
                 else return false;
+            },
+            cumPush(ops) {
+                let tmprank = this.getOpsRank(ops);
+                if (this.opsRank.length == 0 || tmprank >= this.opsRank[this.opsRank.length]) {
+                    this.ops.push(ops);
+                    this.opsRank.push(tmprank);
+                    return;
+                } else {
+                    let fvals = this.vals.pop();
+                    let svals = this.vals.pop();
+                    let operational = this.ops.pop();
+                    this.opsRank.pop();
+                    this.vals.push(this.fourArithmetic(fvals, svals, operational));
+                    this.cumPush(ops);
+                }
+            },
+            getOpsRank(ops) {
+                if (this.isSingleOps(ops)) return 0;
+                if ('+-'.indexOf(ops) !== -1) return 1;
+                else if ('*%'.indexOf(ops) !== -1) return 2;
+                else return 3;
+            },
+            fourArithmetic(firstVal, SecondVal, operational) {
+                switch (operational) {
+                    case '+':
+                        this.vals.push(firstVal + SecondVal);
+                        break;
+                    case '-':
+                        this.vals.push(firstVal - SecondVal);
+                        break;
+                    case '*':
+                        this.vals.push(firstVal * SecondVal);
+
+                        break;
+                    case '%':
+                        this.vals.push(firstVal / SecondVal);
+
+                        break;
+                    case '^':
+                        this.vals.push(Math.pow(fval, sval));
+                        break;
+                }
+            },
+            singleOptArithmetic(val, operational) {
+                switch (operational) {
+                    case "sin":
+                        val = Math.sin(val);
+                        break;
+                    case "cos":
+                        val = Math.cos(val);
+                        break;
+                    case "tan":
+                        val = Math.tan(val);
+                        break;
+                    case "log":
+                        val = Math.log2(val);
+                        break;
+
+                }
             }
         }
     }
