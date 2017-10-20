@@ -25,6 +25,9 @@
         components: {
             buttonItem
         },
+        created() {
+
+        },
         methods: {
             numberBtnKeyon(message) {
                 if (message === "." && this.Pmark) return;
@@ -81,14 +84,13 @@
             cal() {
                 let singleMark = false;
                 this.exp.forEach(function(element) {
-                    if (this.isNumber(element)) {
+                    if (!isNaN(element)) {
                         this.tmpval += element;
                     } else {
                         if (this.isSingleOps(element)) {
                             if (this.tmpval === "") {
                                 singleMark = true;
                                 this.cumPush(element);
-
                             } else {
                                 singleMark = true;
                                 this.vals.push(this.tmpval);
@@ -115,27 +117,35 @@
                     }
                 }, this);
                 this.vals.push(this.tmpval);
+                while (this.ops.length > 0) {
+                    let operational = this.ops.pop();
+                    let svals = this.vals.pop();
+                    let fvals = this.vals.pop();
+                    let result = this.fourArithmetic(fvals, svals, operational);
+                    console.log(result);
+                    this.vals.push(result);
+                }
             },
             isSingleOps(ops) {
                 if ('sincostanlog'.indexOf(ops) !== -1) return true;
                 else return false;
             },
-            isNumber(val) {
-                if ('.00123456789'.indexOf(val) !== -1) return true;
-                else return false;
-            },
             cumPush(ops) {
                 let tmprank = this.getOpsRank(ops);
-                if (this.opsRank.length == 0 || tmprank >= this.opsRank[this.opsRank.length]) {
+                let max = this.opsRank[this.opsRank.length - 1] || 0;
+                console.log("ops:" + ops + "tmp:" + tmprank + "max:" + max);
+                if (tmprank >= max) {
                     this.ops.push(ops);
                     this.opsRank.push(tmprank);
                     return;
                 } else {
-                    let fvals = this.vals.pop();
                     let svals = this.vals.pop();
+                    let fvals = this.vals.pop();
                     let operational = this.ops.pop();
                     this.opsRank.pop();
-                    this.vals.push(this.fourArithmetic(fvals, svals, operational));
+                    let result = this.fourArithmetic(fvals, svals, operational);
+                    this.vals.push(result);
+                    console.log("exp:" + fvals + operational + svals + "=" + result);
                     this.cumPush(ops);
                 }
             },
@@ -145,26 +155,30 @@
                 else if ('*%'.indexOf(ops) !== -1) return 2;
                 else return 3;
             },
-            fourArithmetic(firstVal, SecondVal, operational) {
+            fourArithmetic(firstVal, secondVal, operational) {
+                firstVal = Number(firstVal);
+                secondVal = Number(secondVal);
+                let result;
                 switch (operational) {
                     case '+':
-                        this.vals.push(firstVal + SecondVal);
+                        result = firstVal + secondVal;
                         break;
                     case '-':
-                        this.vals.push(firstVal - SecondVal);
+                        result = firstVal - secondVal;
                         break;
                     case '*':
-                        this.vals.push(firstVal * SecondVal);
+                        result = firstVal * secondVal;
 
                         break;
                     case '%':
-                        this.vals.push(firstVal / SecondVal);
+                        result = firstVal / secondVal;
 
                         break;
                     case '^':
-                        this.vals.push(Math.pow(fval, sval));
+                        result = Math.pow(firstVal, secondVal);
                         break;
                 }
+                return result;
             },
             singleOptArithmetic(val, operational) {
                 switch (operational) {
