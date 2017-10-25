@@ -74,6 +74,7 @@
                 this.vals = [];
                 this.tmpval = "";
                 this.exp = [];
+                this.opsRank = [];
                 this.Pmark = false;
                 this.Zmark = false;
             },
@@ -122,9 +123,9 @@
                     let svals = this.vals.pop();
                     let fvals = this.vals.pop();
                     let result = this.fourArithmetic(fvals, svals, operational);
-                    console.log(result);
                     this.vals.push(result);
                 }
+                this.exp = [this.vals[0]];
             },
             isSingleOps(ops) {
                 if ('sincostanlog'.indexOf(ops) !== -1) return true;
@@ -133,7 +134,6 @@
             cumPush(ops) {
                 let tmprank = this.getOpsRank(ops);
                 let max = this.opsRank[this.opsRank.length - 1] || 0;
-                console.log("ops:" + ops + "tmp:" + tmprank + "max:" + max);
                 if (tmprank >= max) {
                     this.ops.push(ops);
                     this.opsRank.push(tmprank);
@@ -145,7 +145,6 @@
                     this.opsRank.pop();
                     let result = this.fourArithmetic(fvals, svals, operational);
                     this.vals.push(result);
-                    console.log("exp:" + fvals + operational + svals + "=" + result);
                     this.cumPush(ops);
                 }
             },
